@@ -1,4 +1,4 @@
-function generateHtml(data) {
+function generateHtml(realname, title, data, nowdate) {
 
     let content=''
 
@@ -55,7 +55,7 @@ function generateHtml(data) {
             <thead>
                 <tr>
                     <th colspan="7" class="header">
-                        2019年第22周工作周报（2019-05-30）
+                        ${realname}${title}（${nowdate}）
                     </th>
                 </tr>
                 <tr>

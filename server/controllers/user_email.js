@@ -1,7 +1,9 @@
 const UserEmailModel = require('../models/user_email');
+const UserModel = require('../models/user');
 const ZhoubaoModel = require('../models/zhoubao');
 const mail = require('../lib/mail');
 const generateHtml = require('../lib/zhoubaomailhtml');
+const moment = require('moment');
 
 class userEmailController {
 
@@ -135,7 +137,8 @@ class userEmailController {
             let uid = req.session
             try {
                 let emailData = await UserEmailModel.getUserEmailByUId(uid)
-                if (!emailData || (!emailData.sendaddress || !emailData.sendpwd || !emailData.receiveaddress)) {
+                let userInfo = await UserModel.getUserById(uid);
+                if (!userInfo || !emailData || (!emailData.sendaddress || !emailData.sendpwd || !emailData.receiveaddress)) {
                     // 返回，邮箱没有设置
                     this.response.status = 200;
                     this.response.body = {
@@ -158,12 +161,12 @@ class userEmailController {
                     return;
                 }
 
-                let html = generateHtml.generateHtml(JSON.parse(zhoubaoData.contentinfo))
+                let html = generateHtml.generateHtml(userInfo.name, zhoubaoData.title, JSON.parse(zhoubaoData.contentinfo), moment.format('YYYY-MM-DD'))
                 let sendRes = null, mailInfo = zhoubaoData.emailinfo
                 if (!mailInfo || mailInfo == '[]') mailInfo = []
                 else mailInfo = JSON.parse(mailInfo)
                 try {
-                    // let result =  await mail.send(emailData.sendaddress, emailData.sendpwd, emailData.sendaddress, emailData.receiveaddress, zhoubaoData.title, '', html)
+                    await mail.send(emailData.sendaddress, emailData.sendpwd, emailData.sendaddress, emailData.receiveaddress, zhoubaoData.title, '', html)
 
                     sendRes = `${Date.now()}|${emailData.sendaddress}|${emailData.receiveaddress}|send_success`
 
