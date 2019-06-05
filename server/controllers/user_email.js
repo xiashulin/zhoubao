@@ -137,8 +137,8 @@ class userEmailController {
             let uid = req.session
             try {
                 let emailData = await UserEmailModel.getUserEmailByUId(uid)
-                let userInfo = await UserModel.getUserById(uid);
-                if (!userInfo || !emailData || (!emailData.sendaddress || !emailData.sendpwd || !emailData.receiveaddress)) {
+                let userData = await UserModel.getUserById(uid);
+                if (!userData || !emailData || (!emailData.sendaddress || !emailData.sendpwd || !emailData.receiveaddress)) {
                     // 返回，邮箱没有设置
                     this.response.status = 200;
                     this.response.body = {
@@ -161,18 +161,19 @@ class userEmailController {
                     return;
                 }
 
-                let html = generateHtml.generateHtml(userInfo.name, zhoubaoData.title, JSON.parse(zhoubaoData.contentinfo), moment.format('YYYY-MM-DD'))
+                let html = generateHtml.generateHtml(userData.name, zhoubaoData.title, JSON.parse(zhoubaoData.contentinfo), moment().format('YYYY-MM-DD'))
                 let sendRes = null, mailInfo = zhoubaoData.emailinfo
                 if (!mailInfo || mailInfo == '[]') mailInfo = []
                 else mailInfo = JSON.parse(mailInfo)
                 try {
-                    await mail.send(emailData.sendaddress, emailData.sendpwd, emailData.sendaddress, emailData.receiveaddress, zhoubaoData.title, '', html)
+                    let subject = `${userData.name}${zhoubaoData.title}工作周报`
+                    let result = await mail.send(emailData.sendaddress, emailData.sendpwd, emailData.sendaddress, emailData.receiveaddress, subject, '', html)
 
                     sendRes = `${Date.now()}|${emailData.sendaddress}|${emailData.receiveaddress}|send_success`
 
                     mailInfo.push(sendRes)
 
-                    await ZhoubaoModel.uptZhoubaoByUIDAndTitle(uid, req.title, zhoubaoData.contentinfo, JSON.stringify(mailInfo))
+                    await ZhoubaoModel.uptZhoubaoByUIDAndTitle(uid, zhoubaoData.title, zhoubaoData.contentinfo, JSON.stringify(mailInfo))
 
                     this.response.status = 200;
                     this.response.body = {

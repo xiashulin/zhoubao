@@ -60,7 +60,7 @@ body {
   float: left;
   height: 100%;
   position: fixed;
-  background-image: url('../assets/lg_bg.jpg');
+  background-image: url('../assets/lg_bg.jpeg');
   background-position: center;
   background-repeat: no-repeat
 }

@@ -225,10 +225,10 @@ export default {
         project: '',
         lwsubType: '',
         lwContent: '',
-        lwScale: '',
+        lwScale: 0,
         cwsubType: '',
         cwContent: '',
-        cwScale: '',
+        cwScale: 0,
         isSave: true,
         isEdit: true
       }
